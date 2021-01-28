@@ -1,9 +1,19 @@
 import numpy as np
 import neo
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import plotly
-from plotly.subplots import make_subplots
+
+try:
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
+    HAVE_MPL = True
+except ImportError:
+    HAVE_MATPLOTLIB = False
+
+try:
+    import plotly
+    from plotly.subplots import make_subplots
+    HAVE_PLOTLY = True
+except ImportError:
+    HAVE_PLOTLY = False
 
 
 def get_amplitudes(sig, times):
@@ -212,7 +222,7 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
             # - float() converts these Quantities to simple floating point numbers,
             #   since Plotly sometimes struggles with Quantity objects
             x0 = float(sig.t_start)
-            dx = float(sig.sampling_period)
+            dx = float(sig.sampling_period.rescale(sig.t_start.units))
 
             # obtain y-values by rescaling to new units if any were provided
             # (otherwise convert to current units, which does nothing) and
@@ -286,7 +296,7 @@ def add_epochs_to_fig(fig, epochs):
             if engine == 'matplotlib':
                 for ax in fig.get_axes():
                     ax.add_patch(patches.Rectangle(
-                        (ep_start, -1000), ep_duration, 2000, color=color,
+                        (ep_start, -1000), ep_duration, 2000, color=color,  # TODO better height
                         alpha=0.2, zorder=-1))
 
             elif engine == 'plotly':
