@@ -261,18 +261,22 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
     return fig
 
 
+def get_engine_from_fig(fig):
+    if isinstance(fig, plt.Figure):
+        return 'matplotlib'
+    elif isinstance(fig, plotly.graph_objs.Figure):
+        return 'plotly'
+    else:
+        raise ValueError(f'fig has unrecognized type: {type(fig)}')
+
+
 def add_epochs_to_fig(fig, epochs):
     '''Plot epochs as rectangles behind traces across all subplot panels'''
 
+    engine = get_engine_from_fig(fig)
+
     if epochs is None:
         return fig
-
-    if isinstance(fig, plt.Figure):
-        engine = 'matplotlib'
-    elif isinstance(fig, plotly.graph_objs.Figure):
-        engine = 'plotly'
-    else:
-        raise ValueError(f'fig has unrecognized type: {type(fig)}')
 
     for ep in epochs:
         color = ep.annotations.get('color', '#AAAAAA')
@@ -292,3 +296,15 @@ def add_epochs_to_fig(fig, epochs):
                     ysizemode='scaled', yref='paper', y0=0, y1=1)
 
     return fig
+
+
+def save_fig(fig, basename):
+    '''Save the figure to a file'''
+
+    engine = get_engine_from_fig(fig)
+
+    if engine == 'matplotlib':
+        fig.savefig(basename + '.png')
+    elif engine == 'plotly':
+        with open(basename + '.html', 'w') as f:
+            f.write(fig.to_html())
