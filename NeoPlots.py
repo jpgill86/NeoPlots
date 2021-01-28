@@ -1,10 +1,14 @@
+"""
+
+"""
+
 import numpy as np
 import neo
 
 try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as patches
-    HAVE_MPL = True
+    HAVE_MATPLOTLIB = True
 except ImportError:
     HAVE_MATPLOTLIB = False
 
