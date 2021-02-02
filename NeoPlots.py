@@ -142,7 +142,7 @@ def plot_signals_matplotlib(sigs, spiketrains=[], new_units={}, ylims={}, t_star
 
 
 # plot using plotly (interactive, but cannot handle more than a few million points)
-def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=None, t_stop=None, fig_width=None, fig_height=None, downsample_threshold=1e6):
+def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=None, t_stop=None, fig_width=None, fig_height=None, horizontal_spacing=None, vertical_spacing=None, downsample_threshold=1e6):
 
     # ensure sigs is a 2D list of single-channel AnalogSignals
     # - each row in the 2D list corresponds to a panel in the figure
@@ -175,7 +175,11 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
     # - rows determines the number of vertically stacked panels
     # - shared_xaxes ensures that panning and zooming in time in one panel
     #   updates all
-    fig = make_subplots(rows=len(sigs), shared_xaxes=True)
+    # - horizontal_spacing and vertical_spacing must be None or numbers between
+    #   0 and 1
+    fig = make_subplots(rows=len(sigs), shared_xaxes=True,
+                        horizontal_spacing=horizontal_spacing,
+                        vertical_spacing=vertical_spacing)
 
     # get signal amplitudes at spike times
     # - this is done before signal downsampling so that the original amplitudes
