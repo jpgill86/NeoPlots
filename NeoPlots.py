@@ -198,7 +198,7 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
     # - with more than a few million data points at most (sometimes less),
     #   Colab will fail to display the figure, reporting "Runtime disconnected"
     if downsample_threshold is not None:
-        n_points = sum([sig.time_slice(t_start, t_stop).size for sig in row for row in sigs])
+        n_points = sum([sum([sig.time_slice(t_start, t_stop).size for sig in row]) for row in sigs])
         if n_points > downsample_threshold:
             downsample_factor = 2
             while np.ceil(n_points / downsample_factor) + 1 > downsample_threshold:
@@ -207,7 +207,7 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
                 for j, sig in enumerate(row):
                     sigs[i][j] = sig[::downsample_factor]
                     sigs[i][j].sampling_period *= downsample_factor
-            print(f"Downsampled total points from {n_points} to {sum([sig.time_slice(t_start, t_stop).size for sig in row for row in sigs])} using a downsample factor of {downsample_factor}.")
+            print(f"Downsampled total points from {n_points} to {sum([sum([sig.time_slice(t_start, t_stop).size for sig in row]) for row in sigs])} using a downsample factor of {downsample_factor}.")
             print(f"The effective sample rate for plotting will be {sigs[0][0].sampling_rate:g} ({sigs[0][0].sampling_period.rescale('ms'):g}).")  # assuming equal rates for all sigs
 
     # iterate over all AnalogSignals
