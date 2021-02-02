@@ -48,7 +48,7 @@ def plot_signals(*args, **kwargs):
 
 
 # plot using matplotlib (non-interactive, but unlimited by data size)
-def plot_signals_matplotlib(sigs, spiketrains=[], new_units={}, ylims={}, t_start=None, t_stop=None, fig_height=None):
+def plot_signals_matplotlib(sigs, spiketrains=[], new_units={}, ylims={}, t_start=None, t_stop=None, fig_width=None, fig_height=None, dpi=72):
 
     # ensure sigs is a 2D list of single-channel AnalogSignals
     # - each row in the 2D list corresponds to a panel in the figure
@@ -81,8 +81,9 @@ def plot_signals_matplotlib(sigs, spiketrains=[], new_units={}, ylims={}, t_star
     # - nrows determines the number of vertically stacked panels
     # - shared_x ensures that x-axes are synced
     # - figsize determines the width and height in inches
-    # fig, axes = plt.subplots(nrows=len(sigs), ncols=1, squeeze=False, sharex=True, figsize=(12, fig_height or 5))
-    fig, axes = plt.subplots(nrows=len(sigs), ncols=1, squeeze=False, sharex=True, figsize=(18, fig_height or 5))
+    fig_width_inches = fig_width / dpi if fig_width else 18
+    fig_height_inches = fig_height / dpi if fig_height else 5
+    fig, axes = plt.subplots(nrows=len(sigs), ncols=1, squeeze=False, sharex=True, figsize=(fig_width_inches, fig_height_inches))
 
     # iterate over all AnalogSignals
     for i, panel_sigs in enumerate(sigs):
@@ -141,7 +142,7 @@ def plot_signals_matplotlib(sigs, spiketrains=[], new_units={}, ylims={}, t_star
 
 
 # plot using plotly (interactive, but cannot handle more than a few million points)
-def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=None, t_stop=None, fig_height=None, downsample_threshold=1e6):
+def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=None, t_stop=None, fig_width=None, fig_height=None, downsample_threshold=1e6):
 
     # ensure sigs is a 2D list of single-channel AnalogSignals
     # - each row in the 2D list corresponds to a panel in the figure
@@ -270,7 +271,7 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
             fig.add_scatter(x=x, y=y, mode='markers', marker_color=color, name=st.name, row=panel_index+1, col=1)
 
     # remove the unnecessary legend and adjust the height of the entire figure
-    fig.update_layout(showlegend=False, height=fig_height)
+    fig.update_layout(showlegend=False, width=fig_width, height=fig_height)
 
     return fig
 
