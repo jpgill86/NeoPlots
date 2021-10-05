@@ -30,8 +30,10 @@ def plot_segment(*args, **kwargs):
         sigs = kwargs.pop('sigs', seg.analogsignals)
         spiketrains = kwargs.pop('spiketrains', seg.spiketrains)
         epochs = kwargs.pop('epochs', seg.epochs)
+        title = kwargs.pop('title', None)
         fig = plot_signals(*args, sigs=sigs, spiketrains=spiketrains, **kwargs)
         add_epochs_to_fig(fig, epochs)
+        add_title_to_fig(fig, title)
         return fig
     else:
         raise ValueError(f"a neo.Segment must be provided with the segment parameter")
@@ -313,6 +315,23 @@ def add_epochs_to_fig(fig, epochs):
                     type='rect', x0=float(ep_start), x1=float(ep_stop),
                     fillcolor=color, line=dict(width=0), opacity=0.2, layer='below',
                     ysizemode='scaled', yref='paper', y0=0, y1=1)
+
+    return fig
+
+
+def add_title_to_fig(fig, title):
+    '''Add a title to the figure'''
+
+    engine = get_engine_from_fig(fig)
+
+    if title is None:
+        return fig
+
+    if engine == 'matplotlib':
+        fig.axes[0].set_title(title)
+
+    elif engine == 'plotly':
+        fig.update_layout(title=title)
 
     return fig
 
