@@ -307,8 +307,8 @@ def add_epochs_to_fig(fig, epochs):
             if engine == 'matplotlib':
                 for ax in fig.get_axes():
                     ax.add_patch(patches.Rectangle(
-                        (ep_start, -1000), ep_duration, 2000, color=color,  # TODO better height
-                        alpha=0.2, zorder=-1))
+                        (ep_start, -1000), ep_duration, 2000,  # TODO better height
+                        facecolor=color, alpha=0.2, zorder=-1))
 
             elif engine == 'plotly':
                 fig.add_shape(
