@@ -125,16 +125,24 @@ def plot_signals_matplotlib(sigs, spiketrains=[], new_units={}, ylims={}, t_star
             st = st.time_slice(t_start, t_stop)
             channel = st.annotations['channels'][0]
             color = st.annotations.get('color', None)
+
+            # find the panel where the spiketrain should be plotted
             panel_index = None
             for i, row in enumerate(sigs):
-                for sig in row:
-                    if sig.name == channel:
-                        panel_index = i
-                        break
-                if panel_index is not None:
-                    break
+                if panel_index is None:
+                    for sig in row:
+                        if sig.name == channel:
+                            panel_index = i
+                            break
+            if panel_index is None:
+                # if match was not found, skip this spiketrain
+                continue
+
+            spike_amplitudes = get_amplitudes(sig, st.times)
+            st.array_annotate(spike_amplitudes=spike_amplitudes)
+
             x = st.times
-            y = get_amplitudes(sig, x).rescale(new_units.get(sig.name, sig.units)).flatten()
+            y = st.array_annotations['spike_amplitudes'].rescale(new_units.get(sig.name, sig.units)).flatten()
             ax = axes[panel_index][0]
             ax.scatter(x, y, zorder=3, c=color, label=st.name)
 
@@ -188,15 +196,19 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
     #   are fetched accurately
     for st in spiketrains:
         channel = st.annotations['channels'][0]
+
+        # check where the matching signal is among those being plotted
         sig_found = False
         for i, row in enumerate(sigs):
-            for sig in row:
-                if sig.name == channel:
-                    sig_found = True
-                    break
-            if sig_found:
-                break
-        assert sig.name == channel
+            if not sig_found:
+                for sig in row:
+                    if sig.name == channel:
+                        sig_found = True
+                        break
+        if not sig_found:
+            # if match was not found, skip this spiketrain
+            continue
+
         spike_amplitudes = get_amplitudes(sig, st.times)
         st.array_annotate(spike_amplitudes=spike_amplitudes)
 
@@ -264,14 +276,19 @@ def plot_signals_plotly(sigs, spiketrains=[], new_units={}, ylims={}, t_start=No
             st = st.time_slice(t_start, t_stop)
             channel = st.annotations['channels'][0]
             color = st.annotations.get('color', None)
+
+            # find the panel where the spiketrain should be plotted
             panel_index = None
             for i, row in enumerate(sigs):
-                for sig in row:
-                    if sig.name == channel:
-                        panel_index = i
-                        break
-                if panel_index is not None:
-                    break
+                if panel_index is None:
+                    for sig in row:
+                        if sig.name == channel:
+                            panel_index = i
+                            break
+            if panel_index is None:
+                # if match was not found, skip this spiketrain
+                continue
+
             x = st.times
             y = st.array_annotations['spike_amplitudes'].rescale(new_units.get(sig.name, sig.units)).flatten()
             fig.add_scatter(x=x, y=y, mode='markers', marker_color=color, name=st.name, row=panel_index+1, col=1)
